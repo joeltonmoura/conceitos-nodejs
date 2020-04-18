@@ -1,0 +1,46 @@
+route.put('//:id', (request, response) => {
+  const { id } = request.params;
+  const { title, url, techs } = request.body;
+  const resultId = repositories.findIndex((r) => r.id === id);
+
+  if (resultId < 0) {
+    return response.status(400).json({ error: 'id is not valid' });
+  }
+
+  const data = {
+    id,
+    title,
+    url,
+    techs,
+    likes: repositories[resultId].likes,
+  };
+  repositories[resultId] = data;
+  return response.status(200).json(data);
+});
+
+route.delete('//:id', (request, response) => {
+  const { id } = request.params;
+  const resultId = repositories.findIndex((r) => r.id === id);
+
+  if (resultId < 0) {
+    return response.status(400).json({ error: 'id is not valid' });
+  }
+
+  repositories.splice(resultId, 1);
+  return response.status(204).send();
+});
+
+route.post('//:id/like', async (request, response) => {
+  const { id } = request.params;
+  const resultId = repositories.findIndex((r) => r.id === id);
+
+  if (resultId < 0) {
+    return response.status(400).json({ error: 'id is not valid' });
+  }
+
+  repositories[resultId].likes += 1;
+
+  return response.status(200).json(repositories[resultId]);
+});
+
+route.get('/', (request, response) => response.status(200).json(repositories));
